@@ -36,7 +36,6 @@
               }
             ],
             "styles": [
-              "node_modules/sweetalert2/dist/sweetalert2.min.css",
               "src/global.scss",
               "src/theme/variables.scss"
             ],

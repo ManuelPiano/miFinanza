@@ -1,32 +1,33 @@
-
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { IonApp, IonSplitPane, IonMenu, IonContent, IonList, IonListHeader, IonNote, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterOutlet, IonRouterLink } from '@ionic/angular/standalone';
+import { IonApp, IonSplitPane, IonMenu, IonContent, IonList, IonListHeader, IonNote, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterOutlet, IonRouterLink, IonImg } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, archiveOutline, archiveSharp, trashOutline, trashSharp, warningOutline, warningSharp, bookmarkOutline, bookmarkSharp, logOutOutline, logOutSharp } from 'ionicons/icons';
+import { homeOutline, homeSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, archiveOutline, archiveSharp, cashSharp, trashSharp, warningOutline, warningSharp, bookmarkOutline, bookmarkSharp, logOutOutline, logOutSharp } from 'ionicons/icons';
 import { AuthService } from './services/auth.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
-  imports: [RouterLink, RouterLinkActive, IonApp, IonSplitPane, IonMenu, IonContent, IonList, IonListHeader, IonNote, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterLink, IonRouterOutlet],
+  imports: [IonImg, RouterLink, RouterLinkActive, IonApp, IonSplitPane, IonMenu, IonContent, IonList, IonNote, IonMenuToggle, IonItem, IonIcon, IonLabel, IonRouterLink, IonRouterOutlet, CommonModule],
 })
-export class AppComponent {
+export class AppComponent { 
   public appPages = [
-    { title: 'Home', url: '/folder/home', icon: 'mail' },
-    { title: 'Outbox', url: '/folder/outbox', icon: 'paper-plane' },
-    { title: 'Favorites', url: '/folder/favorites', icon: 'heart' },
-    { title: 'Archived', url: '/folder/archived', icon: 'archive' },
-    { title: 'Trash', url: '/folder/trash', icon: 'trash' },
-    { title: 'Spam', url: '/folder/spam', icon: 'warning' },
+    { title: 'Resumen', url: '/folder/resumen', icon: 'home' },
+    { title: 'Gastos', url: '/folder/gastos', icon: 'paper-plane' },
+    { title: 'Ingresos', url: '/folder/ingresos', icon: 'heart' },
+    { title: 'Ahorro', url: '/folder/ahorro', icon: 'archive' },
+    { title: 'Transferencias', url: '/folder/transferencias', icon: 'cash' },
   ];
-  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
+  userName$ = this.authService.getUserName();
+
   constructor(private authService: AuthService, private router: Router) {
-    addIcons({ mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, archiveOutline, archiveSharp, trashOutline, trashSharp, warningOutline, warningSharp, bookmarkOutline, bookmarkSharp, logOutOutline, logOutSharp });
+    addIcons({ homeOutline, homeSharp, paperPlaneOutline, paperPlaneSharp, heartOutline, heartSharp, archiveOutline, archiveSharp, cashSharp, trashSharp, warningOutline, warningSharp, bookmarkOutline, bookmarkSharp, logOutOutline, logOutSharp });
   }
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.authService.logout(); // Removemos la navegación de aquí
   }
 }

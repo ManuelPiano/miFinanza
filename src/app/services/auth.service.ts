@@ -1,68 +1,133 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { AlertController } from '@ionic/angular/standalone';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private isAuthenticated = new BehaviorSubject<boolean>(false);
+  private readonly AUTH_KEY = 'auth_state';
+  private readonly USER_KEY = 'user_name';
+  private isAuthenticated = new BehaviorSubject<boolean>(this.getStoredAuthState());
+  private userName = new BehaviorSubject<string>(this.getStoredUserName());
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private alertController: AlertController
+  ) {
+    this.checkInitialSession();
+  }
 
-  login(username: string, password: string) {
-    if (username === 'admin' && password === 'finanza123') {
+  private checkInitialSession() {
+    if (this.getStoredAuthState()) {
       this.isAuthenticated.next(true);
-      Swal.fire({
-        icon: 'success',
-        title: '¡Bienvenido!',
-        text: 'Has iniciado sesión correctamente',
-        timer: 1500,
-        showConfirmButton: false
-      }).then(() => {
-        // Después de mostrar el mensaje de éxito, redirige a folder/home
-        this.router.navigate(['/folder/home']);
+      this.userName.next(this.getStoredUserName());
+    }
+  }
+
+  private getStoredAuthState(): boolean {
+    const storedState = localStorage.getItem(this.AUTH_KEY);
+    return storedState ? JSON.parse(storedState) : false;
+  }
+
+  private getStoredUserName(): string {
+    return localStorage.getItem(this.USER_KEY) || '';
+  }
+
+  private setStoredAuthState(state: boolean) {
+    localStorage.setItem(this.AUTH_KEY, JSON.stringify(state));
+    this.isAuthenticated.next(state);
+  }
+
+  private setStoredUserName(name: string) {
+    localStorage.setItem(this.USER_KEY, name);
+    this.userName.next(name);
+  }
+
+  getUserName(): Observable<string> {
+    return this.userName.asObservable();
+  }
+
+  isLoggedIn(): Observable<boolean> {
+    return this.isAuthenticated.asObservable();
+  }
+
+  async login(username: string, password: string, name: string) {
+    if (username === 'admin' && password === 'finanza123') {
+      this.setStoredAuthState(true);
+      this.setStoredUserName(name); // Guardamos el nombre de usuario
+      
+      const alert = await this.alertController.create({
+        header: '¡Bienvenido!',
+        message: 'Has iniciado sesión correctamente',
+        cssClass: 'custom-alert',
+        buttons: [{
+          text: 'OK',
+          handler: () => {
+            this.router.navigate(['/folder/home']);
+          }
+        }]
       });
+
+      await alert.present();
       return true;
     } else {
-      this.isAuthenticated.next(false);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Usuario o contraseña incorrectos',
-        confirmButtonText: 'Aceptar'
+      this.setStoredAuthState(false);
+      this.setStoredUserName('');
+      
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Usuario o contraseña incorrectos',
+        cssClass: 'custom-alert',
+        buttons: ['Aceptar']
       });
+
+      await alert.present();
       return false;
     }
   }
 
-  isLoggedIn() {
-    return this.isAuthenticated.asObservable();
-  }
+  async logout() {
+    const alert = await this.alertController.create({
+      header: 'Cerrar Sesión',
+      message: '¿Estás seguro que deseas cerrar la sesión?',
+      cssClass: 'custom-alert',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Sí, cerrar sesión',
+          handler: async () => {
+            this.setStoredAuthState(false);
+            this.setStoredUserName(''); // Limpiamos el nombre de usuario
+            
+            const confirmAlert = await this.alertController.create({
+              header: 'Sesión cerrada',
+              message: 'Has cerrado sesión correctamente',
+              cssClass: 'custom-alert',
+              buttons: [{
+                text: 'OK',
+                handler: () => {
+                  this.router.navigate(['/login']);
+                }
+              }]
+            });
 
-  logout() {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¿Deseas cerrar la sesión?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, cerrar sesión',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.isAuthenticated.next(false);
-        Swal.fire({
-          icon: 'success',
-          title: 'Sesión cerrada',
-          text: 'Has cerrado sesión correctamente',
-          timer: 1500,
-          showConfirmButton: false
-        });
-        this.router.navigate(['/login']);
-      }
+            await confirmAlert.present();
+          }
+        }
+      ]
     });
+
+    await alert.present();
+    
+    const { role } = await alert.onDidDismiss();
+    if (role === 'cancel') {
+      return;
+    }
   }
 }
