@@ -1,0 +1,63 @@
+<ion-content class="ion-padding">
+  <div class="login-container">
+    <ion-img src="assets/Myfinanzas-logo-2.webp" class="logo"></ion-img>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <ion-card>
+        <ion-card-content>
+          <h1 class="ion-text-center">Iniciar Sesión</h1>
+
+          <ion-list>
+            <!-- Input Usuario -->
+            <ion-item>
+              <ion-label position="floating">Usuario</ion-label>
+              <ion-input
+                #username
+                type="text"
+                formControlName="username"
+                placeholder="Ingrese su usuario"
+                [clearInput]="true">
+              </ion-input>
+            </ion-item>
+
+            <!-- Input Contraseña -->
+            <ion-item>
+              <ion-label position="floating">Contraseña</ion-label>
+              <ion-input
+                #password
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Ingrese su contraseña">
+              </ion-input>
+              <ion-button 
+                fill="clear" 
+                slot="end" 
+                (click)="togglePassword()">
+                <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+
+          <!-- Mensajes de error -->
+          <div class="error-messages">
+            <ion-text color="danger" *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.errors?.['required']">
+              El usuario es requerido
+            </ion-text>
+            <ion-text color="danger" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']">
+              La contraseña es requerida
+            </ion-text>
+          </div>
+
+          <!-- Botón de Login -->
+          <ion-button 
+            expand="block" 
+            type="submit" 
+            [disabled]="!loginForm.valid"
+            class="ion-margin-top">
+            Iniciar Sesión
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </form>
+  </div>
+</ion-content>

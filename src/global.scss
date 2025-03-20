@@ -35,3 +35,37 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+// Añade estos estilos en tu global.scss
+.swal2-container {
+    // Hacer el fondo transparente
+    background: rgba(0, 0, 0, 0.4) !important;
+  }
+  
+  .swal2-popup {
+    // Estilo para el popup
+    background: var(--ion-background-color) !important;
+    color: var(--ion-text-color) !important;
+  }
+  
+  // Estilos para modo oscuro
+  .swal2-popup .swal2-title,
+  .swal2-popup .swal2-html-container {
+    color: var(--ion-text-color) !important;
+  }
+  
+  // Ajustar el z-index para que aparezca sobre los elementos de Ionic
+  .swal2-container {
+    z-index: 999999 !important;
+  }
+  
+  // Opcional: Estilo para los botones para que coincidan con el tema de Ionic
+  .swal2-confirm,
+  .swal2-cancel {
+    background: var(--ion-color-primary) !important;
+    color: var(--ion-color-primary-contrast) !important;
+  }
+  
+  .swal2-cancel {
+    background: var(--ion-color-medium) !important;
+    color: var(--ion-color-medium-contrast) !important;
+  }
