@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AlertController } from '@ionic/angular/standalone';
-
+import { DatabaseService } from '../database.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -14,7 +14,8 @@ export class AuthService {
 
   constructor(
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private databaseService: DatabaseService
   ) {
     this.checkInitialSession();
   }
@@ -53,6 +54,31 @@ export class AuthService {
     return this.isAuthenticated.asObservable();
   }
 
+  async register(username: string, password: string, name: string): Promise<boolean> {
+    try {
+      const success = await this.databaseService.addUser(username, password, name);
+      if (success) {
+        const alert = await this.alertController.create({
+          header: 'Éxito',
+          message: 'Usuario registrado correctamente',
+          buttons: ['OK']
+        });
+        await alert.present();
+        return true;
+      } else {
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: 'No se pudo registrar el usuario',
+          buttons: ['OK']
+        });
+        await alert.present();
+        return false;
+      }
+    } catch (error) {
+      console.error('Error en registro:', error);
+      return false;
+    }
+  }
   async login(username: string, password: string, name: string) {
     if (username === 'admin' && password === 'finanza123') {
       this.setStoredAuthState(true);
